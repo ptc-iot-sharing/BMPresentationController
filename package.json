@@ -1,0 +1,56 @@
+{
+    "name": "BMPresentationController",
+    "version": "2.6.0",
+    "description": "An extension that contains several presentation controllerss.",
+    "thingworxServer": "http://localhost:8016",
+    "thingworxUser": "Administrator",
+    "thingworxPassword": "admin",
+    "author": "Thingworx RoIcenter",
+    "minimumThingWorxVersion": "6.0.0",
+    "homepage": "http://roicentersvn/placatus/DemoWebpackWidget",
+    "autoUpdate": {
+        "giteaURL": "http://roicentersvn/api/v1/repos/placatus/DemoWebpackWidget/releases/latest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "http://roicentersvn.ptcnet.ptc.com/placatus/DemoWebpackWidget.git"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack --mode production",
+        "watch": "webpack --watch --mode development",
+        "server": "webpack-dev-server --open",
+        "upload": "webpack --mode development --env.upload",
+        "init": "webpack --env.init"
+    },
+    "license": "ISC",
+    "devDependencies": {
+        "@babel/core": "^7.7.4",
+        "@babel/preset-env": "^7.7.4",
+        "@types/jquery": "^3.3.31",
+        "@types/node": "^12.12.14",
+        "@types/webpack-env": "^1.14.1",
+        "babel-loader": "^8.0.6",
+        "clean-webpack-plugin": "^3.0.0",
+        "copy-webpack-plugin": "^5.0.5",
+        "css-loader": "^3.2.1",
+        "file-loader": "^5.0.2",
+        "dtsbundler-webpack-plugin": "github:stefan-lacatus/dtsbundler-webpack-plugin#master",
+        "extract-text-webpack-plugin": "^3.0.2",
+        "request": "^2.88.0",
+        "source-map-loader": "^0.2.4",
+        "style-loader": "^1.0.1",
+        "terser-webpack-plugin": "^2.2.1",
+        "ts-loader": "^6.2.1",
+        "typescript": "^3.7.2",
+        "url-loader": "^3.0.0",
+        "webpack": "^4.41.2",
+        "webpack-cli": "^3.3.10",
+        "webpack-dev-server": "^3.9.0",
+        "xml2js": "^0.4.22",
+        "zip-webpack-plugin": "^3.0.0"
+    },
+    "dependencies": {
+        "typescriptwebpacksupport": "^2.0.0"
+    }
+}

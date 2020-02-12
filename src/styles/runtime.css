@@ -1,0 +1,60 @@
+
+.BMWindowControllerToolbarButton {
+
+	position: relative;
+
+    font-weight: bold;
+
+	width: 44px;
+	height: 44px;
+	top: 10px;
+	
+	border-radius: 50%;
+
+	margin-left: 8px;
+	margin-right: 8px;
+
+    line-height: 44px;
+    vertical-align: middle;
+    text-align: center;
+
+    pointer: default;
+    cursor: default;
+
+}
+
+.BMWindowControllerToolbarButton:active {
+	background-color: rgba(0, 0, 0, .1);
+}
+
+
+
+.BMWindowControllerToolbarButton > i {
+	font-size: 16px;
+	line-height: 44px;
+	vertical-align: middle;
+}
+
+.BMWindowControllerCloseButton {
+	position: absolute;
+	
+	left: 8px;
+}
+
+.BMWindowControllerCloseButtonDisabled {
+    opacity: .5;
+}
+
+.BMWindowControllerFullScreenButton {
+	position: absolute;
+	
+	left: 72px;
+}
+
+.BMWindowControllerWindow > .BMWindowToolbar {
+    z-index: 3000;
+}
+
+.BMWindowControllerWindow > .BMWindowDragHandle {
+    z-index: 3000;
+}
