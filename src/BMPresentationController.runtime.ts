@@ -626,6 +626,7 @@ let BMControllerSerialVersion = 0;
      */
     anchorNode?: DOMNode;
 
+    // @override - BMWindowDelegate
     DOMNodeForDismissedWindow() {
         return this.anchorNode;
     }
@@ -635,16 +636,19 @@ let BMControllerSerialVersion = 0;
      */
     anchorPoint?: BMPoint;
 
+    // @override - BMWindowDelegate
     rectForDismissedWindow() {
         if (this.anchorPoint) return BMRectMakeWithOrigin(this.anchorPoint, {size: BMSizeMake(1, 1)});
     }
 
+    // @override - BMWindowDelegate
     windowShouldKeepNodeHidden() {
         return YES;
     }
 
     resizeListener?: (event: Event) => void;
 
+    // @override - BMWindowDelegate
     windowWillClose(popup) {
         super.windowWillClose(popup);
 
@@ -805,4 +809,14 @@ let BMControllerSerialVersion = 0;
 
     }
     
+    // @override - BMWindowDelegate
+    windowShouldMove(window: BMWindow, toPosition: BMPoint) {
+        return this.movable;
+    }
+    
+    // @override - BMWindowDelegate
+    windowShouldResize(window: BMWindow, toSize: BMSize) {
+        return this.resizable;
+    }
+
 }
