@@ -9,6 +9,12 @@ declare global {
     }
 }
 
+interface BMControllerWindow extends BMWindow {
+    _mashup?: BMControllerMashup;
+
+    _previousMashup?: BMControllerMashup;
+}
+
 /**
  * Returns the widget with the specified id by searching the target mashup.
  * {
@@ -61,6 +67,11 @@ declare const Encoder: any;
 interface BMControllerMashup extends TWMashup {
     BM_setParameterInternal(parameter: string, value: any);
     _BMView: BMView;
+    
+    /**
+     * Set to `YES` if this mashup's layout is managed by `BMView`.
+     */
+    _BMIsViewMashup: boolean;
 }
 
 declare class DataManager {}
@@ -70,7 +81,7 @@ declare class DataManager {}
  */
 export class BMMashupView extends BMView {
 
-	protected _contentNode!: DOMNode;
+    protected _contentNode!: DOMNode;
 
 	get _supportsAutomaticIntrinsicSize(): boolean {return NO}
 
@@ -120,7 +131,28 @@ let BMControllerSerialVersion = 0;
     /**
      * The controller instance.
      */
-    controller?: BMWindow;
+    controllers: BMControllerWindow[] = [];
+
+    /**
+     * Adds a controller to this presentation controller.
+     * @param controller    The controller to add.
+     */
+    protected addController(controller: BMControllerWindow) {
+        this.controllers.push(controller);
+    }
+
+    /**
+     * Destroys and removes the given controller.
+     * @param controller    The controller to remove.
+     */
+    protected removeController(controller: BMControllerWindow) {
+        let index;
+        if ((index = this.controllers.indexOf(controller)) != -1) {
+            this.destroyMashupForController(controller);
+            controller.release();
+            this.controllers.splice(index, 1);
+        }
+    }
 
     _parameters: any;
 
@@ -137,18 +169,6 @@ let BMControllerSerialVersion = 0;
      * The controller's height.
      */
     @property controllerHeight: number;
-
-	/**
-	 * The mashup instance managed by this controller.
-	 */
-	_mashupInstance?: BMControllerMashup;
-
-	/**
-	 * The mashup instance managed by this controller.
-	 */
-	get mashupInstance(): BMControllerMashup | undefined {
-		return this._mashupInstance;
-    }
     
     /**
      * A promise that is resolved when the mashup definition has loaded.
@@ -250,18 +270,22 @@ let BMControllerSerialVersion = 0;
 	 * @param named <String>							The name of the mashup to render.
 	 * {
 	 * 	@param withDefinition <TWMashupDefinition>		The mashup definition object.
+     *  @param intoController                           The controller in which the mashup will be rendered.
 	 * }
+     * @return                                          The mashup instance.
 	 */
-	protected renderMashupNamed(named: string, args: {withDefinition: TWMashupEntityDefinition}) {
+	protected renderMashupNamed(named: string, args: {withDefinition: TWMashupEntityDefinition, intoController: BMControllerWindow}): TWMashup {
 		// Don't do anything if this mashup no longer corresponds to this cell's mashup
 		if (named != this.mashupName) return;
 
 		this._mashupDefinition = args.withDefinition;
-		let definition = args.withDefinition;
+        let definition = args.withDefinition;
+        
+        const controller = args.intoController;
 
 		// Destroy the current mashup if there is one
-		if (this._mashupInstance) {
-			this._previousMashupInstance = this._mashupInstance;
+		if (controller._mashup) {
+			controller._previousMashup = controller._mashup;
 		}
 
 		var self = this;
@@ -274,7 +298,7 @@ let BMControllerSerialVersion = 0;
 		// because it gets removed when the mashup is destroyed
 		var containerNode: HTMLDivElement = document.createElement('div');
 		containerNode.classList.add('BMControllerMashup');
-		this.controller.contentView.node.appendChild(containerNode);
+		args.intoController.contentView.node.appendChild(containerNode);
 		var container: $ = $(containerNode);
 
 		// If there was a previous mashup that should be destroyed,
@@ -290,7 +314,7 @@ let BMControllerSerialVersion = 0;
 		
 		// Construct the mashup object and its associated data object
 		var mashup = new TW.MashupDefinition() as BMControllerMashup;
-		this._mashupInstance = mashup;
+		controller._mashup = mashup;
 		
 		mashup.dataMgr = new DataManager() as TWDataManager;
 		
@@ -311,7 +335,7 @@ let BMControllerSerialVersion = 0;
 		TW.Runtime.Workspace.Mashups.Current = mashup;
 
         // If the root widget of the new mashup is a view, attach it as a subview of the cell
-        let rootWidget = this._mashupInstance.rootWidget.getWidgets()[0] as any;
+        let rootWidget = controller._mashup.rootWidget.getWidgets()[0] as any;
 
         // Prevent the root view from initiating a layout pass before this cell is ready for display
         if (rootWidget && rootWidget.coreUIView) {
@@ -329,7 +353,7 @@ let BMControllerSerialVersion = 0;
         if (rootWidget && rootWidget.coreUIView) {
             let mashupView: BMMashupView = BMMashupView.viewForMashup(mashup);
             mashup._BMView = mashupView;
-            this.controller.contentView.addSubview(mashupView, {toPosition: 0});
+            args.intoController.contentView.addSubview(mashupView, {toPosition: 0});
 
             let rootView: BMView = rootWidget.coreUIView;
             mashupView.addSubview(rootView);
@@ -341,11 +365,16 @@ let BMControllerSerialVersion = 0;
             BMLayoutConstraint.constraintWithView(rootView, {attribute: BMLayoutAttribute.Height, toView: mashupView, relatedBy: BMLayoutConstraintRelation.Equals, secondAttribute: BMLayoutAttribute.Height}).isActive = YES;
 
             // Similarly, the mashup root widget has to be linked to the cell
-            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Left, toView: this.controller.contentView, secondAttribute: BMLayoutAttribute.Left}).isActive = YES;
-            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Top, toView: this.controller.contentView, secondAttribute: BMLayoutAttribute.Top}).isActive = YES;
-            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Width, toView: this.controller.contentView, relatedBy: BMLayoutConstraintRelation.Equals, secondAttribute: BMLayoutAttribute.Width}).isActive = YES;
-            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Height, toView: this.controller.contentView, relatedBy: BMLayoutConstraintRelation.Equals, secondAttribute: BMLayoutAttribute.Height}).isActive = YES;
+            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Left, toView: args.intoController.contentView, secondAttribute: BMLayoutAttribute.Left}).isActive = YES;
+            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Top, toView: args.intoController.contentView, secondAttribute: BMLayoutAttribute.Top}).isActive = YES;
+            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Width, toView: args.intoController.contentView, relatedBy: BMLayoutConstraintRelation.Equals, secondAttribute: BMLayoutAttribute.Width}).isActive = YES;
+            BMLayoutConstraint.constraintWithView(mashupView, {attribute: BMLayoutAttribute.Height, toView: args.intoController.contentView, relatedBy: BMLayoutConstraintRelation.Equals, secondAttribute: BMLayoutAttribute.Height}).isActive = YES;
 
+
+            mashup._BMIsViewMashup = YES;
+        }
+        else {
+            mashup._BMIsViewMashup = NO;
         }
 		
 		(mashup as any).parameterDefinitions = (definition as any).parameterDefinitions;
@@ -368,7 +397,7 @@ let BMControllerSerialVersion = 0;
 		};
 		
 		// Set up the parameter values
-		if (self._parameters) self._setParametersInternal();
+		if (self._parameters) self._setParametersInternalForController(controller);
 		
 		// Fire the MashupLoaded event to signal that loading is complete
         mashup.fireMashupLoadedEvent();
@@ -386,24 +415,26 @@ let BMControllerSerialVersion = 0;
             if (previousMashupInstance._BMView) {
                 previousMashupInstance._BMView.release();
             }
-		}
+        }
+        
+        return mashup;
     }
 
     /**
      * Creates the mashup for this controller. The `controller` property must be an instance of
      * `BMWindow` when this method is invoked.
      */
-    protected createMashup() {
-        this.renderMashupNamed(this.mashupName, {withDefinition: this._mashupDefinition});
+    protected createMashupForController(controller: BMControllerWindow): TWMashup {
+        return this.renderMashupNamed(this.mashupName, {withDefinition: this._mashupDefinition, intoController: controller});
     }
     
     /**
      * Destroys the current mashup.
      */
-    protected destroyMashup() {
-        if (this._mashupInstance) {
-            this._mashupInstance.destroyMashup();
-            this._mashupInstance = undefined;
+    protected destroyMashupForController(controller: BMControllerWindow): void {
+        if (controller._mashup) {
+            controller._mashup.destroyMashup();
+            controller._mashup = undefined;
         }
     }
 
@@ -411,9 +442,9 @@ let BMControllerSerialVersion = 0;
 	 * Invoked internally by the mashup cell to update the managed mashup's parameters
 	 * to the values currently used by the cell.
 	 */
-	_setParametersInternal(): void {
+	_setParametersInternalForController(controller: BMControllerWindow): void {
 
-		var mashup = this._mashupInstance;
+		var mashup = controller._mashup;
 		if (mashup && this._parameters) {
 			for (var parameter in this._parameters) {
 				mashup.BM_setParameterInternal(parameter, this._parameters[parameter]);
@@ -446,6 +477,7 @@ let BMControllerSerialVersion = 0;
             window.BMMaterialFontsLoaded = YES;
             
             $('head').append('<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">');
+            BMWindow.registerShowcaseElement({node: document.querySelector('#runtime-workspace'), get frame() {return BMRectMake(0, 0, window.innerWidth, window.innerHeight)}});
         }
 
         this.boundingBox[0].style.display = 'none';
@@ -468,8 +500,10 @@ let BMControllerSerialVersion = 0;
         if (info.TargetProperty in this._mashupParameters) {
             this._parameters[info.TargetProperty] = info.SinglePropertyValue;
             this.setProperty(info.TargetProperty, info.SinglePropertyValue);
-            if (this._mashupInstance) {
-                this._mashupInstance.BM_setParameterInternal(info.TargetProperty, info.SinglePropertyValue);
+            for (const controller of this.controllers) {
+                if (controller._mashup) {
+                    controller._mashup.BM_setParameterInternal(info.TargetProperty, info.SinglePropertyValue);
+                }
             }
         }
     }
@@ -483,19 +517,38 @@ let BMControllerSerialVersion = 0;
         this.controllerDidClose();
     }
 
-    windowDidClose(window: BMWindow) {
-        this.destroyMashup();
-        this.controller.release();
-        this.controller = undefined;
+    windowDidClose(window: BMControllerWindow) {
+        if (window._mashup) {
+            window._mashup.destroyMashup();
+            window._mashup = undefined;
+        }
+        window.release();
+        this.controllers.splice(this.controllers.indexOf(window), 1);
+    }
+
+    windowDidResize(window: BMControllerWindow) {
+        if (window._mashup && !window._mashup._BMIsViewMashup) {
+            window._mashup.rootWidget.handleResponsiveWidgets(YES);
+        }
+    }
+
+    windowDidEnterFullScreen(window: BMControllerWindow) {
+        if (window._mashup && !window._mashup._BMIsViewMashup) {
+            window._mashup.rootWidget.handleResponsiveWidgets(YES);
+        }
+    }
+
+    windowDidExitFullScreen(window: BMControllerWindow) {
+        if (window._mashup && !window._mashup._BMIsViewMashup) {
+            window._mashup.rootWidget.handleResponsiveWidgets(YES);
+        }
     }
 
     // @override - TWRuntimeWidget
     beforeDestroy?(): void {
-        if (this._mashupInstance) {
-            this._mashupInstance.destroyMashup();
-        }
-        if (this.controller) {
-            this.controller.release();
+        for (const controller of this.controllers) {
+            this.destroyMashupForController(controller);
+            controller.release;
         }
     }
 }
@@ -503,6 +556,9 @@ let BMControllerSerialVersion = 0;
 @TWWidgetDefinition export class BMPopoverController extends BMControllerBase implements BMWindowDelegate {
 
     @service async bringToFront() {
+        // If this popover is already open, cancel this request
+        if (this.controllers.length) return;
+
         const popover = BMPopover.popoverWithSize(BMSizeMake(this.controllerWidth || 400, this.controllerHeight || 400));
 
         switch (this.anchorKind) {
@@ -545,12 +601,15 @@ let BMControllerSerialVersion = 0;
 
         await this.mashupDefinitionPromise;
 
+        popover.contentView.node.style.borderRadius = '4px';
+        popover.contentView.node.style.overflow = 'hidden';
+
         // If a valid anchor has been identified, bring up the popover
         if (popover.anchorNode || popover.anchorPoint) {
-            this.controller = popover;
+            this.addController(popover);
             popover.delegate = this;
             popover.bringToFrontAnimated(YES);
-            this.createMashup();
+            this.createMashupForController(popover);
         }
         else {
             // Otherwise cancel this action
@@ -594,6 +653,11 @@ let BMControllerSerialVersion = 0;
         }
     }
 
+    async afterRender() {
+        super.afterRender();
+
+    }
+
     /**
      * Controls whether this window is modal.
      */
@@ -618,6 +682,11 @@ let BMControllerSerialVersion = 0;
      * Controls whether this window can be resized.
      */
     @property fullScreenButton: boolean;
+
+    /**
+     * Controls whether multiple windows can be launched by this controller.
+     */
+    @property multipleWindows: boolean;
 
 	/**
 	 * Constructs and returns a toolbar button DOM node. This node will not be added to the document automatically.
@@ -646,6 +715,9 @@ let BMControllerSerialVersion = 0;
 	}
 
     @service async bringToFront() {
+        // If a window is already open and multiple windows are not supported, cancel this request
+        if (this.controllers.length && !this.multipleWindows) return;
+
         const popup = BMWindowMakeWithFrame(BMRectMakeWithOrigin(BMPointMake(0,0), {size: BMSizeMake(this.controllerWidth || 400, this.controllerHeight || 400)}), {modal: this.modal, toolbar: !this.modal || this.closeButton || this.fullScreenButton});
         popup.frame.center = BMPointMake(window.innerWidth / 2 | 0, window.innerHeight / 2 | 0);
         popup.frame = popup.frame;
@@ -654,7 +726,7 @@ let BMControllerSerialVersion = 0;
 
         switch (this.anchorKind) {
             case BMPresentationControllerAnchorKind.None:
-                // None is not really supported for popovers. This will default to the event origin
+                break;
             case BMPresentationControllerAnchorKind.EventOrigin:
                 // For event, only mouse and touch events are supported as other event kinds don't
                 // provide appropriate coordinates
@@ -718,10 +790,10 @@ let BMControllerSerialVersion = 0;
 
         popup.node.classList.add('BMWindowControllerWindow');
         
-        this.controller = popup;
+        this.addController(popup);
         popup.delegate = this;
         popup.bringToFrontAnimated(YES, args);
-        this.createMashup();
+        this.createMashupForController(popup);
 
         if (this.modal) {
             window.addEventListener('resize', this.resizeListener = event => {

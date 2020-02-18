@@ -41,6 +41,7 @@ export class BMControllerBase extends TWComposerWidget {
     anchorKindDidChange(value: string): boolean {
         switch (value) {
             case BMPresentationControllerAnchorKind.EventOrigin:
+            case BMPresentationControllerAnchorKind.EventTarget:
             case BMPresentationControllerAnchorKind.None:
                 this.allWidgetProperties().properties.anchor.isVisible = NO;
                 this.updateProperties({updateUi: YES});
@@ -314,10 +315,10 @@ export class BMWindowController extends BMControllerBase {
     }
 
     // @override - TWComposerWidget
-    @property('NUMBER', defaultValue(90)) width: number;
+    @property('NUMBER', defaultValue(90)) Width: number;
 
     // @override - TWComposerWidget
-    @property('NUMBER', defaultValue(30)) height: number;
+    @property('NUMBER', defaultValue(30)) Height: number;
 
     /**
      * Controls whether this window is modal.
@@ -348,6 +349,12 @@ export class BMWindowController extends BMControllerBase {
      */
     @description('If enabled, the window will have a toggle full screen button.')
     @property('BOOLEAN', defaultValue(true)) fullScreenButton: boolean;
+
+    /**
+     * If enabled, the controller will be able to create multiple windows.
+     */
+    @description('If enabled, the controller will be able to create multiple windows.')
+    @property('BOOLEAN', defaultValue(true)) multipleWindows: boolean;
 
     afterLoad() {
         super.afterLoad();
