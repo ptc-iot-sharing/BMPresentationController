@@ -450,14 +450,16 @@ let BMControllerSerialVersion = 0;
 				mashup.BM_setParameterInternal(parameter, this._parameters[parameter]);
 			}
 			
-			
+            
+            /*
 			// Run a layout pass if the root widget is a BMView
 			let rootWidget = mashup.rootWidget.getWidgets()[0] as any;
 
 			// Trigger a blocking layout pass
 			if (rootWidget && rootWidget.coreUIView) {
 				rootWidget.coreUIView.layout();
-			}
+            }
+            */
 		}
     }
     
@@ -548,7 +550,7 @@ let BMControllerSerialVersion = 0;
     beforeDestroy?(): void {
         for (const controller of this.controllers) {
             this.destroyMashupForController(controller);
-            controller.release;
+            controller.release();
         }
     }
 }
