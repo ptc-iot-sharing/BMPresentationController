@@ -6,6 +6,7 @@ import { BMPresentationControllerAnchorKind } from './shared/constants';
 declare global {
     interface Window {
         BMMaterialFontsLoaded: boolean;
+        BM_WINDOW_Z_INDEX_MAX: number;
     }
 }
 
@@ -72,6 +73,8 @@ interface BMControllerMashup extends TWMashup {
      * Set to `YES` if this mashup's layout is managed by `BMView`.
      */
     _BMIsViewMashup: boolean;
+
+    closeIfPopup(): void;
 }
 
 declare class DataManager {}
@@ -389,12 +392,16 @@ let BMControllerSerialVersion = 0;
 			this.BM_setParameterInternal(key, value);
 			
 			// Otherwise publish the update to the data property
-			this.parameters[key] = value;
+			self._parameters[key] = value;
 			
 			// Dispatch a property update to the Thingworx runtime
 			self.setProperty(key, value);
 			
-		};
+        };
+        
+        mashup.closeIfPopup = function () {
+            args.intoController.dismissAnimated(YES);
+        }
 		
 		// Set up the parameter values
 		if (self._parameters) self._setParametersInternalForController(controller);
@@ -473,6 +480,10 @@ let BMControllerSerialVersion = 0;
     // @override - TWRuntimeWidget
     async afterRender(): Promise<void> {
         require('./styles/runtime.css');
+
+        // As of Thingworx 8.5, the default z-index for mashups has changed from 1500 to 9999.
+        // This extreme z-index value for BMWindow reflects this change.
+        window.BM_WINDOW_Z_INDEX_MAX = 10_500;
 
         // TODO: Need a better way to include this
         if (!window.BMMaterialFontsLoaded) {
