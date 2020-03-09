@@ -172,6 +172,21 @@ let BMControllerSerialVersion = 0;
      * The controller's height.
      */
     @property controllerHeight: number;
+
+    /**
+     * The anchor node, if it exists.
+     */
+    anchorNode?: DOMNode;
+
+    /**
+     * The anchor point, if it exists.
+     */
+    anchorPoint?: BMPoint;
+
+    /**
+     * The anchor rect, if it exists.
+     */
+    anchorRect?: BMRect;
     
     /**
      * A promise that is resolved when the mashup definition has loaded.
@@ -399,8 +414,8 @@ let BMControllerSerialVersion = 0;
 			
         };
         
-        mashup.closeIfPopup = function () {
-            args.intoController.dismissAnimated(YES);
+        mashup.rootWidget.closeIfPopup = function () {
+            args.intoController.dismissAnimated(YES, {toNode: self.anchorNode, toRect: self.anchorRect});
         }
 		
 		// Set up the parameter values
@@ -634,20 +649,10 @@ let BMControllerSerialVersion = 0;
 
 @TWWidgetDefinition export class BMWindowController extends BMControllerBase implements BMWindowDelegate {
 
-    /**
-     * The anchor node, if it exists.
-     */
-    anchorNode?: DOMNode;
-
     // @override - BMWindowDelegate
     DOMNodeForDismissedWindow() {
         return this.anchorNode;
     }
-
-    /**
-     * The anchor point, if it exists.
-     */
-    anchorPoint?: BMPoint;
 
     // @override - BMWindowDelegate
     rectForDismissedWindow() {
@@ -783,6 +788,7 @@ let BMControllerSerialVersion = 0;
 
         this.anchorNode = args.fromNode;
         this.anchorPoint = args.fromRect && args.fromRect.origin;
+        this.anchorRect = args.fromRect;
 
         // Add the close/fullscreen buttons if they were selected
         if (this.closeButton) {

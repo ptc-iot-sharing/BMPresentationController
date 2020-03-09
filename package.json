@@ -2,7 +2,7 @@
     "name": "BMPresentationController",
     "version": "2.6.0",
     "description": "An extension that contains several presentation controllerss.",
-    "thingworxServer": "http://dzanfir1l3:8088",
+    "thingworxServer": "http://dzanfir1l3.ptcnet.ptc.com:8088",
     "thingworxUser": "bmihaiciuc",
     "thingworxPassword": "bmihaiciucbmihaiciuc",
     "author": "Thingworx RoIcenter",
