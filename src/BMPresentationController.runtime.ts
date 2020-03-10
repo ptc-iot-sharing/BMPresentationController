@@ -514,7 +514,7 @@ let BMControllerSerialVersion = 0;
 
         this._mashupParameters = JSON.parse(this.getProperty('_mashupFields'));
         for (const key in this._mashupParameters) {
-            this._parameters[key] = this.getProperty('key');
+            this._parameters[key] = this.getProperty(key);
         }
 
         if (this.mashupName) {
