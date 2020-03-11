@@ -511,8 +511,12 @@ let BMControllerSerialVersion = 0;
         this.boundingBox[0].style.display = 'none';
 
         this._parameters = {};
-
-        this._mashupParameters = JSON.parse(this.getProperty('_mashupFields'));
+        try {
+            this._mashupParameters = JSON.parse(this.getProperty('_mashupFields'));
+        } catch (ex) {
+            // if the mashup had no mashup params, then just initialize an empty object
+            this._mashupParameters = {};
+        }
         for (const key in this._mashupParameters) {
             this._parameters[key] = this.getProperty(key);
         }

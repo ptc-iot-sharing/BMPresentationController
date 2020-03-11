@@ -2,18 +2,18 @@
     "name": "BMPresentationController",
     "version": "2.6.0",
     "description": "An extension that contains several presentation controllerss.",
-    "thingworxServer": "http://dzanfir1l3.ptcnet.ptc.com:8088",
-    "thingworxUser": "bmihaiciuc",
-    "thingworxPassword": "bmihaiciucbmihaiciuc",
+    "thingworxServer": "http://localhost:8015",
+    "thingworxUser": "Administrator",
+    "thingworxPassword": "Administrator12345",
     "author": "Thingworx RoIcenter",
     "minimumThingWorxVersion": "6.0.0",
-    "homepage": "http://roicentersvn/placatus/DemoWebpackWidget",
+    "homepage": "https://github.com/ptc-iot-sharing/BMPresentationController",
     "autoUpdate": {
-        "giteaURL": "http://roicentersvn/api/v1/repos/placatus/DemoWebpackWidget/releases/latest"
+        "giteaURL": "https://github.com/ptc-iot-sharing/BMPresentationController/releases"
     },
     "repository": {
         "type": "git",
-        "url": "http://roicentersvn.ptcnet.ptc.com/placatus/DemoWebpackWidget.git"
+        "url": "https://github.com/ptc-iot-sharing/BMPresentationController.git"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -34,9 +34,9 @@
         "clean-webpack-plugin": "^3.0.0",
         "copy-webpack-plugin": "^5.0.5",
         "css-loader": "^3.2.1",
-        "file-loader": "^5.0.2",
         "dtsbundler-webpack-plugin": "github:stefan-lacatus/dtsbundler-webpack-plugin#master",
         "extract-text-webpack-plugin": "^3.0.2",
+        "file-loader": "^5.0.2",
         "request": "^2.88.0",
         "source-map-loader": "^0.2.4",
         "style-loader": "^1.0.1",
@@ -51,6 +51,6 @@
         "zip-webpack-plugin": "^3.0.0"
     },
     "dependencies": {
-        "typescriptwebpacksupport": "^2.0.0"
+        "typescriptwebpacksupport": "^2.0.3"
     }
 }
