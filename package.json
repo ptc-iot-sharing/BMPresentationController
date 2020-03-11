@@ -1,19 +1,19 @@
 {
     "name": "BMPresentationController",
-    "version": "2.6.0",
+    "version": "2.6.1",
     "description": "An extension that contains several presentation controllerss.",
-    "thingworxServer": "http://dzanfir1l3.ptcnet.ptc.com:8088",
-    "thingworxUser": "bmihaiciuc",
-    "thingworxPassword": "bmihaiciucbmihaiciuc",
+    "thingworxServer": "http://localhost:8015",
+    "thingworxUser": "Administrator",
+    "thingworxPassword": "Administrator12345",
     "author": "Thingworx RoIcenter",
     "minimumThingWorxVersion": "6.0.0",
-    "homepage": "http://roicentersvn/placatus/DemoWebpackWidget",
+    "homepage": "https://github.com/ptc-iot-sharing/BMPresentationController",
     "autoUpdate": {
-        "giteaURL": "http://roicentersvn/api/v1/repos/placatus/DemoWebpackWidget/releases/latest"
+        "giteaURL": "https://github.com/ptc-iot-sharing/BMPresentationController/releases"
     },
     "repository": {
         "type": "git",
-        "url": "http://roicentersvn.ptcnet.ptc.com/placatus/DemoWebpackWidget.git"
+        "url": "https://github.com/ptc-iot-sharing/BMPresentationController.git"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
