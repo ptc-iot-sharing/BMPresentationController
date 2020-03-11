@@ -1,6 +1,7 @@
 
 import { TWWidgetDefinition, property, canBind, didBind, TWEvent, event, service } from 'typescriptwebpacksupport/widgetruntimesupport';
 import { BMPresentationControllerAnchorKind } from './shared/constants';
+import { BMWindow, BMView, DOMNode, NO, BMWindowDelegate, BMPoint, BMRect, BMFunctionCollectionMake, YES, BMLayoutConstraint, BMLayoutAttribute, BMLayoutConstraintRelation, BMRectMake, BMPopover, BMSizeMake, BMPointMake, BMRectMakeWithOrigin, BMWindowMakeWithFrame, BMSize } from 'bm-core-ui';
 
 
 declare global {
@@ -317,7 +318,7 @@ let BMControllerSerialVersion = 0;
 		var containerNode: HTMLDivElement = document.createElement('div');
 		containerNode.classList.add('BMControllerMashup');
 		args.intoController.contentView.node.appendChild(containerNode);
-		var container: $ = $(containerNode);
+		var container: JQuery = $(containerNode);
 
 		// If there was a previous mashup that should be destroyed,
 		// the new mashup starts out transparent

@@ -1,7 +1,6 @@
-///<reference path="../../BMCoreUI/build/ui/BMCoreUI/BMCoreUI.d.ts"/>
-
 import { TWWidgetDefinition, autoResizable, description, property, defaultValue, bindingTarget, service, event, bindingSource, nonEditable, willSet, didSet, TWPropertySelectOptions, selectOptions, hidden } from 'typescriptwebpacksupport/widgetidesupport';
 import {BMPresentationControllerAnchorKind} from './shared/constants'
+import { NO, YES } from 'bm-core-ui';
 
 const anchorOptions: TWPropertySelectOptions[] = [
     {text: 'Event Origin', value: BMPresentationControllerAnchorKind.EventOrigin},
