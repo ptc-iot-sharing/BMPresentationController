@@ -1,74 +1,80 @@
-# Intro
+# BMPresentationController
 
 A set of widgets that presents a mashup in either a popup window or a popover.
 
+## Index
+
+- [About](#about)
+- [Usage](#usage)
+    + [Bindings and properties](#Bindings-and-properties)
+    + [Installation](#installation)
+- [Development](#development)
+
+## About
+
+This repository contains a set of widgets, the **Popover Controller** and the **Window Controller** built on top of [BMCoreUI](https://github.com/ptc-iot-sharing/BMCoreUI) to display a mashup in either a popup window or a popover. 
+
+This enables creation of context menus, information tooltips, as well as modal popups and more.
+
+## Usage
+
+Both widgets work similarly in concept to the _Navigation_ widget, when used as a modal popup. The **Popover Controller** is intended to be uses to show popover, context menus or information tooltips that appear next to the content the user is interacting with, while the **Window Controller** is intended to be used to show popups and information dialogs, that show up in the middle of the screen.
+
+### Bindings and properties
+
+#### Properties
+
+The following properties are available on both the **Popover Controller** and the **Window Controller**:
+
+* **anchorKind**: The kind of anchor from which this controller will originate. In other words, describes the location where the popover will appear and the source for the window animation. Has the following options:
+    * _Event Origin_: Uses the location of the event (the location where the user clicked or touched).
+    * _Event Target_: Uses the location of the html element that the user has clicked or touched. 
+    * _Selector_: Uses the location of the first html element found that matches the CSS selector in the _anchor_ property using [document.querySelector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector).
+    * _Widget_: Uses the location of the widget with the display name equal to the _anchor_ property.
+    * _None_: Defaults to using the _Event Origin_.
+* **anchor**: _Binding Target_: See the **anchorKind** _Selector_ and _Widget_ options.
+* **mashupName**: _Binding Target_: The name of the mashup to be displayed.
+* **controllerWidth, controllerHeight**: The dimensions of the mashup that will be displayed.
+* **Other Parameters**: The mashup parameters set on _mashupName_ will also be displayed for as properties of this widget.
+
+The following properties are only available on the **Window Controller**:
+
+* **modal**: Controls whether this window is modal.
+* **movable**: Controls whether this window can be moved.
+* **resizable**: Controls whether this window can be resized.
+* **fullScreenButton**: If enabled, the window will have a toggle full screen button.
+* **multipleWindows**: If enabled, the controller will be able to create multiple windows.
+
+#### Services
+
+* **bringToFront**: Shows this controller.
+* **dismiss**: Dismisses this controller.
+
+#### Events
+
+* **controllerDidClose**: Triggered when this controller closes.
+
 ## Developing
 
-### Required software
+### Installation
+- Navigate to the [releases page](/releases)
+- Under the latest release, view all the assets
+- Download the file `BMPresentationController-min-<VERSION>.zip`
+- Import the widget into Thingworx
 
-The following software is required:
+# Development
+This projects welcomes contributions. For details about pre-requisites, development environment and file structure, please see https://github.com/ptc-iot-sharing/ThingworxDemoWebpackWidget/tree/supportv2. 
 
-* [NodeJS](https://nodejs.org/en/) needs to be installed and added to the `PATH`. You should use the LTS version.
+To setup a development environment, run the following:
+* `npm install`: installs the necessary development dependencies
 
-The following software is recommended:
+To run a build:
+* `npm run build`: builds the extension. Creates a new extension zip file under the `zip` folder.
+* `npm run buildDev`: builds the extension with sourcemaps enabled. Creates a new extension zip file under the `zip` folder.
+* `npm run upload`: creates a build, and uploads the extension zip to the thingworx server configured in `package.json`.
 
-* [Visual Studio Code](https://code.visualstudio.com/): An integrated developer enviroment with great typescript support. You can also use any IDE of your liking, it just that most of the testing was done using VSCode.
+If you want to develop both _bm-core-ui_ and this package in parallel, you can use [npm link](https://docs.npmjs.com/cli/link.html). The following instructions should get you started:
+1. In the `BMCoreUI` project folder, run `npm link`
+2. In the `BMPresentationController`, run `npm link bm-core-ui`
 
-### Proposed folder structure
-
-```
-demoWebpackTypescriptWidget
-│   README.md         // this file
-│   package.json      // here you specify project name, homepage and dependencies. This is the only file you should edit to start a new project
-│   tsconfig.json     // configuration for the typescript compiler
-│   webpack.config.js // configuration for webpack
-│   metadata.xml      // thingworx metadata file for this widget. This is automatically generated based on your package.json
-│   index.html        // when testing the widget outside of thingworx, the index file used.
-└───src               // main folder where your developement will take place
-│   │   index.ts               // source file used when testing the widget outside of twx
-│   │   demoWebpack.ide.ts     // source file for the Composer section of the widget
-│   │   demoWebpack.runtime.ts // source file for the Runtime section of the widget
-│   └───internalLogic          // usually, put the enternal logic into a separate namespace
-│   │   │   file1.ts           // typescript file with internal logic
-│   │   │   file2.js           // javascript file in ES2015 with module
-│   │   │   ...
-│   └───styles        // folder for css styles that you can import into your app using require statements
-│   └───images        // folder for image resources you are statically including using require statements
-│   └───static        // folder for resources that are copied over to the development extension. Think of folder of images that you referece only dynamicaly
-└───build         // temporary folder used during compilation
-└───zip               // location of the built extension
-```
-
-### Developing a new widget
-
-In order to start developing a new widget using this template you need to do the following:
-
-1. Clone this repository
-    ```
-    git clone http://roicentersvn.ptcnet.ptc.com/placatus/DemoWebpackWidget.git
-    ```
-2. Open `package.json` and configure the `name`, `description`, and other fields you find relevant
-3. Run `npm install`. This will install the development dependencies for this project.
-4. Run `npm run init`. This will create sample runtime and ide typescript files using the name.
-5. Start working on your widget.
-
-### Adding dependencies
-
-Dependencies can be added from [npm](https://www.npmjs.com/), using the `npm install DEPENDENCY_NAME --save` command, or by adding them directly to `package.json`, under `dependencies`. After adding them to `package.json`, you should run `npm install`.
-If you are using a javascript library that also has typescript mappings you can install those using `npm install --save @types/DEPENDENCY_NAME`.
-
-### Building and publishing
-
-The following commands allow you to build and compile your widget:
-
-* `npm run build`: builds the production version of the widget. Creates a new extension zip file under the `zip` folder. The production version is optimized for sharing and using in production enviroments.
-* `npm run upload`: creates a build, and uploads the extension zip to the thingworx server configured in `package.json`. The build is created for developement, with source-maps enabled.
-* `npm run watch`: watches the source files, and whenever they change, do a build.
-
-## Example of widgets that use this starter kit
-
-* [SVGViewer](http://roicentersvn/placatus/SvgViewerWidget): Allows viewing, interacting and manipulating SVG files in Thingworx. Contains examples of using external libraries.
-* [BMView](http://roicentersvn/BogdanMihaiciuc/BMView): Allows using BMView and constraint-based layouts in Thingworx.
-* [BMCollectionView](http://roicentersvn/BogdanMihaiciuc/BMCollectionView): Displays a highly customizable collection of reusable items.
-* [Calendar](http://roicentersvn/BogdanMihaiciuc/Calendar): A calendar widget for Thingworx built using the fullcalendar library.  Contains examples of using external libraries as well as referencing global external libraries without including them in the built package.
-* [mxDiagramViewer](http://roicentersvn/placatus/MxGraphDiagramWidget): Uses an much older version of this starter kit. Contains examples of using external libraries.
+This will create a symlink in `BMPresentationController\node_modules\bm-core-ui` to the `BMCoreUI` folder.
