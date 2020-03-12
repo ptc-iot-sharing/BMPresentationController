@@ -43,11 +43,14 @@ module.exports = function (env, argv) {
             // this is the path when viewing the widget in thingworx
             publicPath: `../Common/extensions/${packageName}/ui/${packageJson.name}/`
         },
+        externals: {
+            'bm-core-ui': 'window'
+        },
         plugins: [
             // delete build and zip folders
             new CleanWebpackPlugin({
                 cleanOnceBeforeBuildPatterns: [path.resolve('build/**'), path.resolve('zip/**')]
-            }),        
+            }),
             // in case we just want to copy some resources directly to the widget package, then do it here
             new CopyWebpackPlugin([{ from: 'src/static', to: 'static' }]),
             // in case the extension contains entities, copy them as well
