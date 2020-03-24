@@ -531,11 +531,12 @@ let BMControllerSerialVersion = 0;
     updateProperty(info: TWUpdatePropertyInfo) {
         super.updateProperty(info);
         if (info.TargetProperty in this._mashupParameters) {
-            this._parameters[info.TargetProperty] = info.SinglePropertyValue;
-            this.setProperty(info.TargetProperty, info.SinglePropertyValue);
+            let value = info.RawSinglePropertyValue || info.SinglePropertyValue;
+            this._parameters[info.TargetProperty] = value;
+            this.setProperty(info.TargetProperty, value);
             for (const controller of this.controllers) {
                 if (controller._mashup) {
-                    controller._mashup.BM_setParameterInternal(info.TargetProperty, info.SinglePropertyValue);
+                    controller._mashup.BM_setParameterInternal(info.TargetProperty, value);
                 }
             }
         }
