@@ -409,9 +409,12 @@ let BMControllerSerialVersion = 0;
 			
 			// Otherwise publish the update to the data property
 			self._parameters[key] = value;
-			
-			// Dispatch a property update to the Thingworx runtime
-			self.setProperty(key, value);
+            
+            if (self.controllers.length == 1 && self.controllers[0] == controller) {
+                // Dispatch a property update to the Thingworx runtime, if this is the
+                // single open window
+                self.setProperty(key, value);
+            }
 			
         };
         
@@ -472,17 +475,6 @@ let BMControllerSerialVersion = 0;
 			for (var parameter in this._parameters) {
 				mashup.BM_setParameterInternal(parameter, this._parameters[parameter]);
 			}
-			
-            
-            /*
-			// Run a layout pass if the root widget is a BMView
-			let rootWidget = mashup.rootWidget.getWidgets()[0] as any;
-
-			// Trigger a blocking layout pass
-			if (rootWidget && rootWidget.coreUIView) {
-				rootWidget.coreUIView.layout();
-            }
-            */
 		}
     }
     
@@ -501,7 +493,8 @@ let BMControllerSerialVersion = 0;
         // This extreme z-index value for BMWindow reflects this change.
         window.BM_WINDOW_Z_INDEX_MAX = 10_500;
 
-        // TODO: Need a better way to include this
+        // TODO: Need a better way to include this, ideally the toolbar buttons should just
+        // be regular images instead of font icons
         if (!window.BMMaterialFontsLoaded) {
             window.BMMaterialFontsLoaded = YES;
             
@@ -534,7 +527,11 @@ let BMControllerSerialVersion = 0;
             let value = info.RawSinglePropertyValue || info.SinglePropertyValue;
             this._parameters[info.TargetProperty] = value;
             this.setProperty(info.TargetProperty, value);
-            for (const controller of this.controllers) {
+
+            // It doesn't make much sense to sync the properties of a set of windows, so updates will only
+            // happen when there a single window open
+            if (this.controllers.length == 1) {
+                const controller = this.controllers[0];
                 if (controller._mashup) {
                     controller._mashup.BM_setParameterInternal(info.TargetProperty, value);
                 }
