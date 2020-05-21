@@ -1,7 +1,7 @@
+///<reference path="../node_modules/bm-core-ui/lib/@types/BMCoreUI.min.d.ts"/>
 
 import { TWWidgetDefinition, property, canBind, didBind, TWEvent, event, service } from 'typescriptwebpacksupport/widgetruntimesupport';
 import { BMPresentationControllerAnchorKind } from './shared/constants';
-import { BMWindow, BMView, DOMNode, NO, BMWindowDelegate, BMPoint, BMRect, BMFunctionCollectionMake, YES, BMLayoutConstraint, BMLayoutAttribute, BMLayoutConstraintRelation, BMRectMake, BMPopover, BMSizeMake, BMPointMake, BMRectMakeWithOrigin, BMWindowMakeWithFrame, BMSize } from 'bm-core-ui';
 
 
 declare global {

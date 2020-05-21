@@ -43,9 +43,6 @@ module.exports = function (env, argv) {
             // this is the path when viewing the widget in thingworx
             publicPath: `../Common/extensions/${packageName}/ui/${packageJson.name}/`
         },
-        externals: {
-            'bm-core-ui': 'window'
-        },
         plugins: [
             // delete build and zip folders
             new CleanWebpackPlugin({
