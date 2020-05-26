@@ -1,3 +1,9 @@
+# 2.6.0 Beta 7
+
+Adds support for specifying custom classes to be added to the controller DOM nodes.
+
+When using multiple windows, parameter updates will no longer propagate to all window instances. Instead, the parameters will only be used for window creation.
+
 # 2.6.0 Beta 3
 
 Fixed usage of old typescriptwebpacksupport that breaks other widgets using newer versions
