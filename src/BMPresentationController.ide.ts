@@ -147,7 +147,7 @@ export class BMControllerBase extends TWComposerWidget {
      * One or more custom classes to add to the controller DOM node.
      */
     @description('One or more custom classes to add to the controller DOM node.')
-    @property('STRING', defaultValue('')) controllerClass;
+    @property('STRING', defaultValue(''), bindingTarget) controllerClass;
     
     // @override - TWComposerWidget
     afterLoad() {

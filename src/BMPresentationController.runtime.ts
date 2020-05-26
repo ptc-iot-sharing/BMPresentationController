@@ -177,7 +177,12 @@ let BMControllerSerialVersion = 0;
     /**
      * One or more CSS classes to add to the controller DOM node.
      */
-    @property controllerClass: string;
+    @property set controllerClass(CSSClass: string) {
+        if (this.controllers.length == 1) {
+            const controller = this.controllers[0];
+            controller.CSSClass = CSSClass || '';
+        }
+    }
 
     /**
      * The anchor node, if it exists.
