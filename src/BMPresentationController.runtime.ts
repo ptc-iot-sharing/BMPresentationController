@@ -178,7 +178,7 @@ let BMControllerSerialVersion = 0;
      * One or more CSS classes to add to the controller DOM node.
      */
     @property set controllerClass(CSSClass: string) {
-        if (this.controllers.length == 1) {
+        if (!this.getProperty('multipleWindows')) {
             const controller = this.controllers[0];
             controller.CSSClass = CSSClass || '';
         }
@@ -540,7 +540,7 @@ let BMControllerSerialVersion = 0;
 
             // It doesn't make much sense to sync the properties of a set of windows, so updates will only
             // happen when there a single window open
-            if (this.controllers.length == 1) {
+            if (!this.getProperty('multipleWindows')) {
                 const controller = this.controllers[0];
                 if (controller._mashup) {
                     controller._mashup.BM_setParameterInternal(info.TargetProperty, value);
