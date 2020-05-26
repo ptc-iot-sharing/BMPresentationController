@@ -175,6 +175,11 @@ let BMControllerSerialVersion = 0;
     @property controllerHeight: number;
 
     /**
+     * One or more CSS classes to add to the controller DOM node.
+     */
+    @property controllerClass: string;
+
+    /**
      * The anchor node, if it exists.
      */
     anchorNode?: DOMNode;
@@ -591,6 +596,7 @@ let BMControllerSerialVersion = 0;
         if (this.controllers.length) return;
 
         const popover = BMPopover.popoverWithSize(BMSizeMake(this.controllerWidth || 400, this.controllerHeight || 400));
+        if (this.controllerClass) popover.CSSClass = this.controllerClass;
 
         switch (this.anchorKind) {
             case BMPresentationControllerAnchorKind.None:
@@ -746,6 +752,7 @@ let BMControllerSerialVersion = 0;
         const popup = BMWindowMakeWithFrame(BMRectMakeWithOrigin(BMPointMake(0,0), {size: BMSizeMake(this.controllerWidth || 400, this.controllerHeight || 400)}), {modal: this.modal, toolbar: !this.modal || this.closeButton || this.fullScreenButton});
         popup.frame.center = BMPointMake(window.innerWidth / 2 | 0, window.innerHeight / 2 | 0);
         popup.frame = popup.frame;
+        if (this.controllerClass) popup.CSSClass = this.controllerClass;
 
         const args = {fromNode: undefined, fromRect: undefined};
 

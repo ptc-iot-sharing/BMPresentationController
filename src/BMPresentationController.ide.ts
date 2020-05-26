@@ -142,6 +142,12 @@ export class BMControllerBase extends TWComposerWidget {
      */
     @description('Triggered when this controller closes.')
     @event controllerDidClose;
+
+    /**
+     * One or more custom classes to add to the controller DOM node.
+     */
+    @description('One or more custom classes to add to the controller DOM node.')
+    @property('STRING', defaultValue('')) controllerClass;
     
     // @override - TWComposerWidget
     afterLoad() {
