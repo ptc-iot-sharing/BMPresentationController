@@ -17,6 +17,8 @@ interface BMControllerWindow extends BMWindow {
     _previousMashup?: BMControllerMashup;
 }
 
+declare var BM_WINDOW_Z_INDEX_MAX: number;
+
 /**
  * Returns the widget with the specified id by searching the target mashup.
  * {
@@ -501,7 +503,7 @@ let BMControllerSerialVersion = 0;
 
         // As of Thingworx 8.5, the default z-index for mashups has changed from 1500 to 9999.
         // This extreme z-index value for BMWindow reflects this change.
-        window.BM_WINDOW_Z_INDEX_MAX = 10_500;
+        BM_WINDOW_Z_INDEX_MAX = 10_500;
 
         // TODO: Need a better way to include this, ideally the toolbar buttons should just
         // be regular images instead of font icons
