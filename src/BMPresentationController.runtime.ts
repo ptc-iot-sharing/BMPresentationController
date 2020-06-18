@@ -666,16 +666,6 @@ let BMControllerSerialVersion = 0;
 @TWWidgetDefinition export class BMWindowController extends BMControllerBase implements BMWindowDelegate {
 
     // @override - BMWindowDelegate
-    DOMNodeForDismissedWindow() {
-        return this.anchorNode;
-    }
-
-    // @override - BMWindowDelegate
-    rectForDismissedWindow() {
-        if (this.anchorPoint) return BMRectMakeWithOrigin(this.anchorPoint, {size: BMSizeMake(1, 1)});
-    }
-
-    // @override - BMWindowDelegate
     windowShouldKeepNodeHidden() {
         return YES;
     }
@@ -761,7 +751,7 @@ let BMControllerSerialVersion = 0;
         popup.frame = popup.frame;
         if (this.controllerClass) popup.CSSClass = this.controllerClass;
 
-        const args = {fromNode: undefined, fromRect: undefined};
+        //const args = {fromNode: undefined, fromRect: undefined};
 
         switch (this.anchorKind) {
             case BMPresentationControllerAnchorKind.None:
@@ -772,45 +762,41 @@ let BMControllerSerialVersion = 0;
                 if (window.event) {
                     if (window.event instanceof MouseEvent) {
                         const event = window.event as MouseEvent;
-                        args.fromRect = BMRectMakeWithOrigin(BMPointMake(event.clientX, event.clientY), {size: BMSizeMake(1, 1)});
+                        popup.anchorRect = BMRectMakeWithOrigin(BMPointMake(event.clientX, event.clientY), {size: BMSizeMake(1, 1)});
                     }
                     else if (window.event instanceof TouchEvent) {
                         const touch = window.event.changedTouches[0];
-                        args.fromRect = BMRectMakeWithOrigin(BMPointMake(touch.clientX, touch.clientY), {size: BMSizeMake(1, 1)});
+                        popup.anchorRect = BMRectMakeWithOrigin(BMPointMake(touch.clientX, touch.clientY), {size: BMSizeMake(1, 1)});
                     }
                 }
                 break;
             case BMPresentationControllerAnchorKind.EventTarget:
                 if (window.event && window.event instanceof UIEvent) {
-                    args.fromNode = (window.event as any)._BMOriginalTarget || window.event.currentTarget as HTMLElement || window.event.target as HTMLElement;
+                    popup.anchorNode = (window.event as any)._BMOriginalTarget || window.event.currentTarget as HTMLElement || window.event.target as HTMLElement;
                 }
                 break;
             case BMPresentationControllerAnchorKind.Selector:
                 // For selector, find the element according to the selector
                 const node = document.querySelector(this.anchor) as DOMNode;
                 if (node) {
-                    args.fromNode = node;
+                    popup.anchorNode = node;
                 }
                 break;
             case BMPresentationControllerAnchorKind.Widget:
                 // For widget, find the widget based on its display name
                 const widget = BMFindWidget({named: this.anchor, inMashup: this.mashup});
                 if (widget) {
-                    args.fromNode = widget.boundingBox[0];
+                    popup.anchorNode = widget.boundingBox[0];
                 }
                 break;
         }
 
         await this.mashupDefinitionPromise;
 
-        this.anchorNode = args.fromNode;
-        this.anchorPoint = args.fromRect && args.fromRect.origin;
-        this.anchorRect = args.fromRect;
-
         // Add the close/fullscreen buttons if they were selected
         if (this.closeButton) {
             this.createToolbarButtonWithClass('BMWindowControllerCloseButton', {forWindow: popup, content: '<i class="material-icons">&#xE5CD;</i>', action: () => {
-                popup.dismissAnimated(YES, {toRect: args.fromRect, toNode: args.fromNode});
+                popup.dismissAnimated(YES);
             }});
         }
         else if (this.fullScreenButton) {
@@ -832,7 +818,7 @@ let BMControllerSerialVersion = 0;
         
         this.addController(popup);
         popup.delegate = this;
-        popup.bringToFrontAnimated(YES, args);
+        popup.bringToFrontAnimated(YES);
         this.createMashupForController(popup);
 
         if (this.modal) {
