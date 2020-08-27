@@ -394,3 +394,89 @@ export class BMWindowController extends BMControllerBase {
     };
 
 }
+
+/**
+ * A controller that managed the lifecycle of an alert popup window.
+ */
+@description('A controller that manages the lifecycle of an alert popup window.')
+@TWWidgetDefinition('Alert Controller')
+export class BMAlertController extends TWComposerWidget {
+    
+    @description('The controller\'s title.')
+    @property('STRING', defaultValue('Alert'), bindingTarget) title;
+
+    @description('A detailed description to display below the title.')
+    @property('STRING', defaultValue('An error has occured.'), bindingTarget) description;
+
+    @description('The label to use for the alert\'s confirmation button.')
+    @property('STRING', defaultValue('OK'), bindingTarget) confirmationButtonLabel;
+
+    /**
+     * Shows this controller.
+     */
+    @description('Shows this controller.')
+    @service bringToFront;
+
+    /**
+     * Dismisses this controller.
+     */
+    @description('Dismisses this controller.')
+    @service dismiss;
+
+    /**
+     * Triggered when this popover closes.
+     */
+    @description('Triggered when this controller closes.')
+    @event controllerDidClose;
+
+    /**
+     * One or more custom classes to add to the controller DOM node.
+     */
+    @description('One or more custom classes to add to the controller DOM node.')
+    @property('STRING', defaultValue(''), bindingTarget) controllerClass;
+
+    
+    // @override - TWComposerWidget
+    widgetIconUrl(): string {
+        return require('./images/icon.png').default;
+    }
+    
+    // @override - TWComposerWidget
+    renderHtml(): string {
+        require('./styles/ide.css');
+        return `<div class="widget-content BMPresentationController BMWindowController">Alert Controller</div>`;
+    };
+
+    // @override - TWComposerWidget
+    afterRender() {}
+
+    // @override - TWComposerWidget
+    beforeDestroy() {}
+
+}
+
+
+
+/**
+ * A controller that managed the lifecycle of a confirmation popup window.
+ */
+@description('A controller that manages the lifecycle of a confirmation popup window.')
+@TWWidgetDefinition('Confirmation Controller')
+export class BMConfirmationController extends BMAlertController {
+
+    @description('The label to use for the confirmation\'s decline button.')
+    @property('STRING', defaultValue('OK'), bindingTarget) declineButtonLabel;
+
+    @description('Controls whether to display a cancel button, in addition to the confirm and decline buttons.')
+    @property('STRING', defaultValue(NO), bindingTarget) showsCancelButton;
+    
+    @description('Triggered when the use selects the confirmation button.')
+    @event confirmed;
+    
+    @description('Triggered when the use selects the cancel button.')
+    @event cancelled;
+    
+    @description('Triggered when the use selects the decline button.')
+    @event declined;
+
+}

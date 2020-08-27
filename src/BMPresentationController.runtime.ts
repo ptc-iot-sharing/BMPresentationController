@@ -1,4 +1,5 @@
-///<reference path="../node_modules/bm-core-ui/lib/@types/BMCoreUI.min.d.ts"/>
+////<reference path="../node_modules/bm-core-ui/lib/@types/BMCoreUI.min.d.ts"/>
+///<reference path="../../BMCoreUI/build/ui/BMCoreUI/BMCoreUI.d.ts"/>
 
 import { TWWidgetDefinition, property, canBind, didBind, TWEvent, event, service } from 'typescriptwebpacksupport/widgetruntimesupport';
 import { BMPresentationControllerAnchorKind } from './shared/constants';
@@ -762,16 +763,19 @@ let BMControllerSerialVersion = 0;
                 if (window.event) {
                     if (window.event instanceof MouseEvent) {
                         const event = window.event as MouseEvent;
+                        //@ts-ignore
                         popup.anchorRect = BMRectMakeWithOrigin(BMPointMake(event.clientX, event.clientY), {size: BMSizeMake(1, 1)});
                     }
                     else if (window.event instanceof TouchEvent) {
                         const touch = window.event.changedTouches[0];
+                        //@ts-ignore
                         popup.anchorRect = BMRectMakeWithOrigin(BMPointMake(touch.clientX, touch.clientY), {size: BMSizeMake(1, 1)});
                     }
                 }
                 break;
             case BMPresentationControllerAnchorKind.EventTarget:
                 if (window.event && window.event instanceof UIEvent) {
+                    //@ts-ignore
                     popup.anchorNode = (window.event as any)._BMOriginalTarget || window.event.currentTarget as HTMLElement || window.event.target as HTMLElement;
                 }
                 break;
@@ -779,6 +783,7 @@ let BMControllerSerialVersion = 0;
                 // For selector, find the element according to the selector
                 const node = document.querySelector(this.anchor) as DOMNode;
                 if (node) {
+                    //@ts-ignore
                     popup.anchorNode = node;
                 }
                 break;
@@ -786,6 +791,7 @@ let BMControllerSerialVersion = 0;
                 // For widget, find the widget based on its display name
                 const widget = BMFindWidget({named: this.anchor, inMashup: this.mashup});
                 if (widget) {
+                    //@ts-ignore
                     popup.anchorNode = widget.boundingBox[0];
                 }
                 break;
@@ -841,4 +847,135 @@ let BMControllerSerialVersion = 0;
         return this.resizable;
     }
 
+}
+
+@TWWidgetDefinition export class BMAlertController extends TWRuntimeWidget implements BMWindowDelegate {
+
+    popup?: BMAlertPopup;
+    
+    @property set title(title: string) {
+        if (this.popup) this.popup.title = title;
+    }
+    
+    @property set description(description: string) {
+        if (this.popup) this.popup.text = description;
+    }
+    
+    @property set confirmationButtonLabel(label: string) {
+        if (this.popup) this.popup.positiveActionText = label;
+    }
+
+    /**
+     * Shows this controller.
+     */
+    @service bringToFront() {
+        if (this.popup) return;
+
+        this.popup = BMAlertPopup.alertPopupWithTitle(this.title, {text: this.description, actionText: this.confirmationButtonLabel});
+        this.popup.delegate = this;
+
+        this.popup.confirm();
+    }
+
+    /**
+     * Dismisses this controller.
+     */
+    @service dismiss() {
+        if (this.popup) {
+            this.popup.dismissAnimated(YES);
+            this.popup = undefined;
+        }
+    }
+
+    /**
+     * Triggered when this popover closes.
+     */
+    @event controllerDidClose: TWEvent;
+
+    /**
+     * One or more custom classes to add to the controller DOM node.
+     */
+    @property set controllerClass(cls: string) {
+        if (this.popup) {
+            this.popup.CSSClass = cls;
+        }
+    }
+
+    // @override - BMWindow
+    windowShouldClose(): boolean {
+        return NO;
+    }
+
+    windowWillClose() {
+        this.controllerDidClose();
+    }
+
+    windowDidClose(window: BMWindow) {
+        window.release();
+    }
+
+    renderHtml() {
+        return '<div class="widget-content"></div>'
+    }
+
+    afterRender() {
+        this.boundingBox[0].style.display = 'none';
+    }
+
+    beforeDestroy() {
+        if (this.popup) this.popup.release();
+    }
+
+}
+
+@TWWidgetDefinition export class BMConfirmationController extends BMAlertController {
+
+    popup?: BMConfirmationPopup;
+    
+    @property set confirmationButtonLabel(label: string) {
+        if (this.popup) this.popup.positiveActionText = label;
+    }
+
+    @property set declineButtonLabel(label: string) {
+        if (this.popup) this.popup.negativeActionText = label;
+    }
+
+    @property set showsCancelButton(shows: boolean) {
+        if (typeof shows === 'string') shows = (shows == 'true') ? true : false;
+
+        if (this.popup) this.popup.showsCancelButton = shows;
+    }
+    
+    @event confirmed: TWEvent;
+    
+    @event cancelled: TWEvent;
+    
+    @event declined: TWEvent;
+
+    /**
+     * Shows this controller.
+     */
+    @service bringToFront() {
+        if (this.popup) return;
+
+        this.popup = BMConfirmationPopup.confirmationPopupWithTitle(this.title, {text: this.description, positiveActionText: this.confirmationButtonLabel, negativeActionText: this.declineButtonLabel});
+        this.popup.showsCancelButton = this.showsCancelButton;
+        this.popup.delegate = this;
+
+        this.popup.confirm();
+    }
+
+    windowWillClose() {
+        switch (this.popup?.result) {
+            case BMConfirmationPopupResult.Declined:
+                this.declined();
+                break;
+            case BMConfirmationPopupResult.Confirmed:
+                this.confirmed();
+                break;
+            default:
+                this.cancelled();
+        }
+        this.controllerDidClose();
+    }
 }
