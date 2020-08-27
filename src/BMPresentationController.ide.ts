@@ -468,7 +468,7 @@ export class BMConfirmationController extends BMAlertController {
     @property('STRING', defaultValue('OK'), bindingTarget) declineButtonLabel;
 
     @description('Controls whether to display a cancel button, in addition to the confirm and decline buttons.')
-    @property('STRING', defaultValue(NO), bindingTarget) showsCancelButton;
+    @property('BOOLEAN', defaultValue(NO), bindingTarget) showsCancelButton;
     
     @description('Triggered when the use selects the confirmation button.')
     @event confirmed;
