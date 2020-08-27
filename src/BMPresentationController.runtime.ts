@@ -883,7 +883,6 @@ let BMControllerSerialVersion = 0;
     @service dismiss() {
         if (this.popup) {
             this.popup.dismissAnimated(YES);
-            this.popup = undefined;
         }
     }
 
@@ -907,6 +906,7 @@ let BMControllerSerialVersion = 0;
     }
 
     windowWillClose() {
+        this.popup = undefined;
         this.controllerDidClose();
     }
 
@@ -976,6 +976,8 @@ let BMControllerSerialVersion = 0;
             default:
                 this.cancelled();
         }
+
+        this.popup = undefined;
         this.controllerDidClose();
     }
 }
