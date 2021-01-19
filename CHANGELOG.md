@@ -1,3 +1,7 @@
+# 2.6.7
+
+Updated dependecies.
+
 # 2.6.0 Beta 7
 
 Adds support for specifying custom classes to be added to the controller DOM nodes.

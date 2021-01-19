@@ -1,6 +1,6 @@
 {
     "name": "BMPresentationController",
-    "version": "2.6.0",
+    "version": "2.6.7",
     "description": "An extension that contains several presentation controllers.",
     "thingworxServer": "http://localhost:8016",
     "thingworxUser": "Administrator",
@@ -52,6 +52,6 @@
         "zip-webpack-plugin": "^3.0.0"
     },
     "dependencies": {
-        "typescriptwebpacksupport": "^2.0.4"
+        "typescriptwebpacksupport": "^2.0.9"
     }
 }
